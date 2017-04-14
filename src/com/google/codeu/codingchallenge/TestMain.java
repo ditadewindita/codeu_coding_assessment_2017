@@ -21,7 +21,7 @@ final class TestMain {
 
   public static void main(String[] args) {
 
-    final Tester tests = new Tester();
+    /*final Tester tests = new Tester();
 
     tests.add("Empty Object", new Test() {
       @Override
@@ -76,6 +76,9 @@ final class TestMain {
       public JSON object() {
         return new MyJSON();
       }
-    });
+    });*/
+
+    MyJSONParser parser = new MyJSONParser();
+    System.out.println(parser.isValidObject("{\"qooooo\" : \"uyyaya\" , \"what\" : \"wy\", \"name\" : {\"name\" : \"uyo\"}}"));
   }
 }
