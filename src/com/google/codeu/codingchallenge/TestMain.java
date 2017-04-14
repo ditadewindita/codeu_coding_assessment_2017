@@ -19,9 +19,9 @@ import java.util.HashSet;
 
 final class TestMain {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception{
 
-    /*final Tester tests = new Tester();
+    final Tester tests = new Tester();
 
     tests.add("Empty Object", new Test() {
       @Override
@@ -66,6 +66,26 @@ final class TestMain {
       }
     });
 
+    // Extra unit test
+    tests.add("Object Value 2", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{\"name\" : \"dita\", \"age\" : \"19\", \"favorites\" : {\"chicken\" : \"nuggets\", \"cheese\" : \"bread\", \"drinks\" : {\"iced\" : \"tea\"}}, \"height\" : \"5 foot 5 in\"}");
+
+        final JSON favObj = obj.getObject("favorites");
+
+        Asserts.isNotNull(favObj);
+        Asserts.isEqual("nuggets", favObj.getString("chicken"));
+        Asserts.isEqual("bread", favObj.getString("cheese"));
+
+        final JSON drinksObj = favObj.getObject("drinks");
+        Asserts.isNotNull(drinksObj);
+        Asserts.isEqual("tea", drinksObj.getString("iced"));
+      }
+    });
+
     tests.run(new JSONFactory(){
       @Override
       public JSONParser parser() {
@@ -76,9 +96,25 @@ final class TestMain {
       public JSON object() {
         return new MyJSON();
       }
-    });*/
+    });
 
-    MyJSONParser parser = new MyJSONParser();
-    System.out.println(parser.isValidObject("{\"qooooo\" : \"uyyaya\" , \"what\" : \"wy\", \"name\" : {\"name\" : \"uyo\"}}"));
+    // final JSONParser parser = new MyJSONParser();
+    // final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" } }");
+    //
+    // final JSON nameObj = obj.getObject("name");
+    //
+    // System.out.println(nameObj.getObject("name"));
+
+    // JSONParser parser = new MyJSONParser();
+    // JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" } }");
+    // JSON nameObj = obj.getObject("name");
+    // System.out.println(nameObj.getString("first"));
+
+    // JSON json = parser.parse("{\"name\" : \"dita\", \"age\" : \"19\", \"favorites\" : {\"chicken\" : \"nuggets\", \"cheese\" : \"bread\"}, \"height\" : \"5 foot 5 in\"}");
+    // System.out.println(json.getObject("\"favorites\"").getString("\"cheese\""));
+
+    //System.out.println(parser.parse("{\"name\" : \"dita\", \"age\" : \"19\", \"favorites\" : {\"chicken\" : \"nuggets\", \"cheese\" : \"bread\"}, \"height\" : \"5 foot 5 in\"}"));
+    //System.out.println(parser.isValidPair("\"name\" : {\"name\" : \"uyo\"}"));
+    //System.out.println(parser.parse("{\"pseudo\" : \"dita\"}"));
   }
 }

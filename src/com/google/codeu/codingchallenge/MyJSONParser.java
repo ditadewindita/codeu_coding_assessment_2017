@@ -16,90 +16,87 @@ package com.google.codeu.codingchallenge;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 final class MyJSONParser implements JSONParser {
 
-  private HashMap<String, Object> list;
+  //private HashMap<String, Object> list = new HashMap<String, Object>();
 
   @Override
   public JSON parse(String in) throws IOException {
-    list = new HashMap<String, Object>();
-
-    boolean valid = isValidObject(in);
-    if(!valid)
+    if(!isValidObject(in))
       return null;
 
-    return new MyJSON(list);
+    MyJSON json = new MyJSON();
+
+    String temp = in.trim().substring(1, in.length()-1).trim();
+    if(temp.equals(""))
+      return json;
+    String[] elements = temp.split(",");
+
+    if(elements.length < 1)
+      return json;
+
+    for(int i=0; i<elements.length; i++){
+      String s = elements[i].trim();
+      while(i < elements.length && s.contains("{") && !s.contains("}"))
+        s += "," + elements[++i];
+
+      if(!isValidPair(s))
+        return null;
+
+      int colon = s.indexOf(":");
+      String key = s.substring(0, colon).trim();
+      String value = s.substring(colon+1).trim();
+      key = key.substring(1, key.length()-1);
+
+      if(isValidObject(value))
+        json.setObject(key, new MyJSONParser().parse(value));
+      else
+        json.setString(key, (value = value.substring(1, value.length()-1)));
+    }
+
+    return json;
   }
 
   public boolean isValidObject(String in){
-    int len = in.length();
-    String[] elements;
+    int len;
+    String key, value;
+    String[] elements, pair;
 
-    // Trim off leading/trailing whitespace
     in = in.trim();
+    len = in.length();
 
-    // If there is no room for bracket pair, or if brackets aren't in the appropriate spot, return false
     if(len < 2 || in.charAt(0) != '{' || in.charAt(len-1) != '}')
       return false;
 
-    // Split object's elements into string array
-    in = in.substring(1, len-1);
-    elements = in.split(",");
-
-    System.out.println(in);
-    // Since elements string array's split is dependent on a comma, exlude the array's elements which include the object's brackets
-    for(int i=0; i<elements.length; i++){
-      String s = elements[i].trim();
-
-      if(s.charAt(0) == '{' && !isValidObject(s))
-        return false;
-
-      else if(!isValidPair(s))
-        return false;
-
-      // list.put(s.substring(0, s.indexOf(":")).trim(), s.substring(s.indexOf(":")).trim()));
-    }
+    if(numStrings(in, "\"") / 4 > 1 && numStrings(in, ",") < 1)
+      return false;
 
     return true;
   }
 
   public boolean isValidPair(String in){
-    int j, len = in.length(), midStart = -1, midEnd = -1, spaceBtwn = 0, numColon = 0;
-
     // Trim off leading/trailing whitespace
     in = in.trim();
 
-    // If string doesn't have room for two sets of double quotes and colon or it doesn't contain a colon, it's an invalid pair
-    if(len < 5 || !in.contains(":"))
+    // Split pair into seperate key/value strings
+    int colonIndex = in.indexOf(":");
+    String key = in.substring(0, colonIndex).trim();
+    String value = in.substring(colonIndex+1).trim();
+
+    // If the value is a nested object, check if it's a valid object
+    if(value.charAt(0) == '{' && !isValidObject(value))
       return false;
 
-    for(int i=0; i<len; i++){
-      char c = in.charAt(i);
-      if(c == '\"'){
-        // Get index of end double quote of current key/value
-        for(j=i+1; in.charAt(j) != '\"'; j++);
+    // Else if the value is just a string, check if it's a valid string
+    else if(value.charAt(0) != '{' && !isValidString(value))
+      return false;
 
-        // If key/value isn't a valid string, return false
-        if(!isValidString(in.substring(i, j+1)))
-          return false;
-
-        // Record index after key is visited to check for colon
-        if(i == 0 && midStart == -1)
-          midStart = j+1;
-
-        // Record index before value is visited to check for colon
-        if(i > 0 && midEnd == -1)
-          midEnd = i-1;
-
-        // Jump to index j (end of key/value string) since already checked if string is valid
-        i = j;
-      }
-    }
-
-    // Since key/value are valid strings, return if there only exists a colon between
-    return in.substring(midStart, midEnd+1).trim().equals(":");
+    // Pair validity depends on the key, which is always a string, so check if it's a valid key
+    return isValidString(key);
   }
+
 
   public boolean isValidString(String in){
     // Trim off leading/trailing whitespace
@@ -128,4 +125,12 @@ final class MyJSONParser implements JSONParser {
     return numQuotes % 2 == 0;
   }
 
+  public int numStrings(String in, String s){
+    int len = in.length(), count = 0;
+    for(int i=0; i<len; i++)
+      if(in.substring(i, i+1).equals(s))
+        count++;
+
+    return count;
+  }
 }

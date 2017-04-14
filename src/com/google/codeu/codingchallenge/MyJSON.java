@@ -19,55 +19,71 @@ import java.util.HashMap;
 
 final class MyJSON implements JSON {
 
+  // Instance variables
   private HashMap<String, Object> list;
 
-  public MyJSON(HashMap<String, Object> list){
-      this.list = list;
+  public MyJSON(){
+      list = new HashMap<String, Object>();
   }
 
+  // Getters
   public HashMap<String, Object> getHashMap(){
     return list;
   }
 
+  // Setters
+  public void setHashMap(HashMap<String, Object> h){
+    list = h;
+  }
+
   @Override
   public JSON getObject(String name) {
-    return (list.get(name) instanceof MyJSON) ? (MyJSON)list.get(name) : null;
+    // If the pairing value of 'name' is an object, return it, otherwise return null
+    return (list.get(name) instanceof JSON) ? (JSON)list.get(name) : null;
   }
 
   @Override
   public JSON setObject(String name, JSON value) {
-    if(list.containsKey(name) && list.get(name) instanceof MyJSON){
+    // If the pair exist already, remove it
+    if(list.containsKey(name) && list.get(name) instanceof JSON)
       list.remove(name);
-      list.put(name, value);
-    }
+
+    // Put the pair in the list
+    list.put(name, value);
 
     return this;
   }
 
   @Override
   public String getString(String name) {
+    // If the pairing value of 'name' is a string, return it, otherwise return null
     return (list.get(name) instanceof String) ? (String)list.get(name) : null;
+
   }
 
   @Override
   public JSON setString(String name, String value) {
-    if(list.containsKey(name) && list.get(name) instanceof String){
+    // If the pair exists already, remove it
+    if(list.containsKey(name) && list.get(name) instanceof String)
       list.remove(name);
-      list.put(name, value);
-    }
+
+    // Put the pair in the list
+    list.put(name, value);
 
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
+    // Iterate through the keys of the hash map, and if the key is an object, add to the collection
     for(String key: list.keySet())
-      if(list.get(key) instanceof MyJSON)
+      if(list.get(key) instanceof JSON)
         names.add(key);
   }
 
   @Override
   public void getStrings(Collection<String> names) {
+    // Iterate through the keys of the hash map, and if the key is an string, add to the collection
     for(String key: list.keySet())
       if(list.get(key) instanceof String)
         names.add(key);
